@@ -1,0 +1,96 @@
+name: release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DSMLP_STORAGE_CONTROLLER_CA: ${{ secrets.DSMLP_STORAGE_CONTROLLER_CA }}
+  DSMLP_STORAGE_CONTROLLER_CERT: ${{ secrets.DSMLP_STORAGE_CONTROLLER_CERT}}
+  DSMLP_STORAGE_CONTROLLER_KEY: ${{ secrets.DSMLP_STORAGE_CONTROLLER_KEY }}
+  DSMLP_STORAGE_CONTROLLER_PORT: ${{ secrets.DSMLP_STORAGE_CONTROLLER_PORT }}
+  DSMLP_STORAGE_CONTROLLER_DNS: ${{ secrets.DSMLP_STORAGE_CONTROLLER_DNS }}
+  DSMLP_STORAGE_CONTROLLER_OPTS: ${{ secrets.DSMLP_STORAGE_CONTROLLER_OPTS }}
+  DSMLP_STORAGE_CONTROLLER_CLIENT_CERT: ${{ secrets.DSMLP_STORAGE_CONTROLLER_CLIENT_CERT }}
+  DSMLP_STORAGE_CONTROLLER_CLIENT_KEY: ${{ secrets.DSMLP_STORAGE_CONTROLLER_CLIENT_KEY }}
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && github.ref_type == 'tag'
+    steps:
+      - name: Run action for creating release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  go-server-release:
+    name: Create Go server release
+    needs: [create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout actions
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Go Release Action
+        uses: wangyoucao577/go-release-action@v1.38
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_tag: ${{ github.ref_name }}
+          goos: linux
+          goarch: amd64
+          project_path: ./cmd/server
+          pre_command: go env -w GO111MODULE=auto
+
+  rpm-release:
+    name: Create RPM release
+    needs: [create-release]
+    runs-on: ubuntu-latest
+    # env:
+    #   RPM_VERSION: ${{ github.ref_name | cut -c 2- | sed -i 's/-/~/g' }}
+    steps:
+      - name: Checkout actions
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set RPM_VERSION
+        run: |
+          echo "RPM_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
+      - name: print RPM VERSION
+        run: |
+          echo RPM_VERSION=$RPM_VERSION
+      - name: Install build dependencies
+        run: |
+          chmod +x ./.devcontainer/library-scripts/go-debian.sh
+          sudo ./.devcontainer/library-scripts/go-debian.sh
+          sudo apt-get install rpm
+      - name: Build RPM
+        run: |
+          mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS
+          git archive --format=tar.gz --prefix=dsmlpstorage-${{ env.RPM_VERSION }}/ -o ~/rpmbuild/SOURCES/dsmlpstorage-${{ env.RPM_VERSION }}.tar.gz HEAD
+          ls -al ~/rpmbuild/SOURCES
+          tar -ztvf ~/rpmbuild/SOURCES/dsmlpstorage-${{ env.RPM_VERSION }}.tar.gz
+          cp rpm/dsmlpstorage.spec ~/rpmbuild/SPECS
+          cd ~/rpmbuild
+          rpmbuild -ba -vv --define "version ${{ env.RPM_VERSION }}" ~/rpmbuild/SPECS/dsmlpstorage.spec
+      # - name: Upload RPM
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
+      #     path: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
+      - name: Release RPM
+        uses: softprops/action-gh-release@v1
+        with:
+          files: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
