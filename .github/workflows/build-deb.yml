@@ -34,7 +34,7 @@ jobs:
       - name: Prepare DEB build directory
         run: |
           mkdir -p ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          cp -r * ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
+          cp -r ./* ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
           cd ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
           dpkg-deb --build . ../nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
 
