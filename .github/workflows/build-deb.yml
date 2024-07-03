@@ -1,51 +1,47 @@
 name: release
 on:
   push:
-    # tags:
-    #   - "v*.*.*"
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  rpm-release:
+  deb-release:
     name: Create DEB release
-    needs: [create-release]
     runs-on: ubuntu-latest
-    # env:
-    #   RPM_VERSION: ${{ github.ref_name | cut -c 2- | sed -i 's/-/~/g' }}
+
     steps:
       - name: Checkout actions
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Set DEB_VERSION
         run: |
           echo "DEB_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
-      - name: print RPM VERSION
+          
+      - name: Print DEB_VERSION
         run: |
           echo DEB_VERSION=$DEB_VERSION
+          
       - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential devscripts debhelper dh-make
+
       - name: Prepare DEB build directory
         run: |
           mkdir -p ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
           cp -r * ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
           cd ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
           dpkg-deb --build . ../nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
-      # - name: Upload RPM
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
-      #     path: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
+
       - name: Print DEB Package
         run: |
           ls -al ~/debbuild/
-
+          
       - name: Release DEB
         uses: softprops/action-gh-release@v1
         with:
