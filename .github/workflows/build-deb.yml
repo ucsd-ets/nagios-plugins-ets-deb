@@ -1,16 +1,40 @@
 name: release
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
   packages: write
 
 jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up tag version
+        id: vars
+        run: echo "TAG_NAME=v$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Create and push tag
+        env:
+          TAG_NAME: ${{ env.TAG_NAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+
   deb-release:
     name: Create DEB release
+    needs: tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
