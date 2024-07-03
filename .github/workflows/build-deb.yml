@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   rpm-release:
-    name: Create RPM release
+    name: Create DEB release
     needs: [create-release]
     runs-on: ubuntu-latest
     # env:
@@ -21,34 +21,34 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set RPM_VERSION
+      - name: Set DEB_VERSION
         run: |
-          echo "RPM_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
+          echo "DEB_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
       - name: print RPM VERSION
         run: |
-          echo RPM_VERSION=$RPM_VERSION
+          echo DEB_VERSION=$DEB_VERSION
       - name: Install build dependencies
         run: |
-          chmod +x ./.devcontainer/library-scripts/go-debian.sh
-          sudo ./.devcontainer/library-scripts/go-debian.sh
-          sudo apt-get install rpm
-      - name: Build RPM
+          sudo apt-get update
+          sudo apt-get install -y build-essential devscripts debhelper dh-make
+      - name: Prepare DEB build directory
         run: |
-          mkdir -p ~/rpmbuild/SOURCES ~/rpmbuild/SPECS
-          git archive --format=tar.gz --prefix=dsmlpstorage-${{ env.RPM_VERSION }}/ -o ~/rpmbuild/SOURCES/dsmlpstorage-${{ env.RPM_VERSION }}.tar.gz HEAD
-          ls -al ~/rpmbuild/SOURCES
-          tar -ztvf ~/rpmbuild/SOURCES/dsmlpstorage-${{ env.RPM_VERSION }}.tar.gz
-          cp rpm/dsmlpstorage.spec ~/rpmbuild/SPECS
-          cd ~/rpmbuild
-          rpmbuild -ba -vv --define "version ${{ env.RPM_VERSION }}" ~/rpmbuild/SPECS/dsmlpstorage.spec
+          mkdir -p ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
+          cp -r * ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
+          cd ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
+          dpkg-deb --build . ../nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
       # - name: Upload RPM
       #   uses: actions/upload-artifact@v3
       #   with:
       #     name: dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
       #     path: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
-      - name: Release RPM
+      - name: Print DEB Package
+        run: |
+          ls -al ~/debbuild/
+
+      - name: Release DEB
         uses: softprops/action-gh-release@v1
         with:
-          files: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
+          files: ~/debbuild/nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
