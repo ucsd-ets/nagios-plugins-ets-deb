@@ -1,35 +1,54 @@
-name: Release DEB Package
+name: Build and Release DEB Package
+
 on:
   push:
     tags:
-      - 'v*.*.*'
-
-permissions:
-  contents: write
-  packages: write
+      - 'v*'
 
 jobs:
-  deb-release:
-    name: Create DEB release
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dpkg-dev
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
-      - name: Build DEB
-        run: |
-          mkdir -p build
-          dpkg-deb --build nagios-plugins-ets-1.4 build/nagios-plugins-ets-1.4.deb
+    - name: Create directories for DEB packaging
+      run: |
+        mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
+        mkdir -p nagios-plugins-ets-1.4/DEBIAN
 
-      - name: Upload DEB as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: nagios-plugins-ets-1.4.deb
-          path: b
+    - name: Copy files
+      run: |
+        cp DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/
+        cp DEBIAN/postinst nagios-plugins-ets-1.4/DEBIAN/
+        chmod 755 nagios-plugins-ets-1.4/DEBIAN/postinst
+        cp check_mem.c nagios-plugins-ets-1.4/check_mem.c
+        cp -r usr/lib64/nagios/plugins/* nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/
+
+    - name: Build DEB package
+      run: dpkg-deb --build nagios-plugins-ets-1.4
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload DEB package to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./nagios-plugins-ets-1.4.deb
+        asset_name: nagios-plugins-ets-1.4.deb
+        asset_content_type: application/vnd.debian.binary-package
