@@ -1,8 +1,9 @@
-name: release
+name: Release DEB Package
 on:
   push:
     tags:
       - 'v*.*.*'
+
 permissions:
   contents: write
   packages: write
@@ -31,11 +32,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nagios-plugins-ets-1.4.deb
-          path: build/nagios-plugins-ets-1.4.deb
-
-      - name: Release DEB
-        uses: softprops/action-gh-release@v1
-        with:
-          files: build/nagios-plugins-ets-1.4.deb
-          generate_release_notes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          path: b
