@@ -33,7 +33,6 @@ jobs:
 
       - name: Copy plugin files
         run: |
-          cp check_mem.c nagios-plugins-ets-1.4/
           cp control nagios-plugins-ets-1.4/DEBIAN/
           cp postinst nagios-plugins-ets-1.4/DEBIAN/
 
