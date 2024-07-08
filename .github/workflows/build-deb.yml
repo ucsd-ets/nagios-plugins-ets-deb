@@ -2,6 +2,8 @@ name: Build and Release DEB Package
 
 on:
   push:
+    tags:
+      - '*'
 
 jobs:
   rpm-release:
@@ -51,23 +53,25 @@ jobs:
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
 
+      - name: Extract tag name
+        id: extract_tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.extract_tag.outputs.tag }}
+          name: Release ${{ steps.extract_tag.outputs.tag }}
           draft: false
           prerelease: false
 
       - name: Upload DEB package to Release
-        id: upload_deb
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: ./nagios-plugins-ets-1.4.deb
           content_type: application/vnd.debian.binary-package
-          release_id: ${{ steps.create_release.outputs.id }}
