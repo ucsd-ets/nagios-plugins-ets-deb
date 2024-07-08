@@ -8,6 +8,9 @@ jobs:
     name: Create DEB release
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
@@ -15,7 +18,7 @@ jobs:
         run: |
           pwd
           ls
-          
+
       - name: Create directories for DEB packaging
         run: |
           mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
