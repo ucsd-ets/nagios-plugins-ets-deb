@@ -12,6 +12,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Debug: List files in repository
+        run: ls -R
+
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
@@ -40,18 +43,3 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload DEB package to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./nagios-plugins-ets-1.4.deb
-          asset_name: nagios-plugins-ets-1.4.deb
-          asset_content_type: application/vnd.debian.binary-package
