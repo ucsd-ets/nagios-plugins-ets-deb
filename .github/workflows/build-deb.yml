@@ -1,53 +1,54 @@
-name: release
+name: Build and Release DEB Package
+
 on:
   push:
-    # tags:
-    #   - "v*.*.*"
-
-permissions:
-  contents: write
-  packages: write
+    tags:
+      - 'v*'
 
 jobs:
   rpm-release:
     name: Create DEB release
     runs-on: ubuntu-latest
-    # env:
-    #   RPM_VERSION: ${{ github.ref_name | cut -c 2- | sed -i 's/-/~/g' }}
     steps:
-      - name: Checkout actions
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set DEB_VERSION
-        run: |
-          echo "DEB_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
-      - name: print RPM VERSION
-        run: |
-          echo DEB_VERSION=$DEB_VERSION
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential devscripts debhelper dh-make
-      - name: Prepare DEB build directory
-        run: |
-          mkdir -p ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          cp -r * ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          cd ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          dpkg-deb --build . ../nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
-      # - name: Upload RPM
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
-      #     path: /home/runner/rpmbuild/RPMS/x86_64/dsmlpstorage-${{ env.RPM_VERSION }}-0.x86_64.rpm
-      - name: Print DEB Package
-        run: |
-          ls -al ~/debbuild/
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Release DEB
-        uses: softprops/action-gh-release@v1
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Create directories for DEB packaging
+        run: |
+          mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
+          mkdir -p nagios-plugins-ets-1.4/DEBIAN
+
+      - name: Copy files
+        run: |
+          cp DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/
+          cp DEBIAN/postinst nagios-plugins-ets-1.4/DEBIAN/
+          chmod 755 nagios-plugins-ets-1.4/DEBIAN/postinst
+          cp check_mem.c nagios-plugins-ets-1.4/check_mem.c
+          cp -r usr/lib64/nagios/plugins/* nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/
+
+      - name: Build DEB package
+        run: dpkg-deb --build nagios-plugins-ets-1.4
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ~/debbuild/nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
-          generate_release_notes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload DEB package to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nagios-plugins-ets-1.4.deb
+          asset_name: nagios-plugins-ets-1.4.deb
+          asset_content_type: application/vnd.debian.binary-package
