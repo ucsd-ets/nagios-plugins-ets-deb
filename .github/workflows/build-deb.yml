@@ -16,15 +16,6 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
-      - name: Create directories for DEB packaging
-        run: mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
-
-      - name: Copy plugin files
-        run: |
-          cp nagios-plugins-ets-1.4/check_mem.c nagios-plugins-ets-1.4/check_mem.c
-          cp -r nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/* nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/
-          chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
-
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
 
