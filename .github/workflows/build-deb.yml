@@ -30,6 +30,10 @@ jobs:
           wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon.py
           wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
           chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
+          
+      - name: Print folder structure
+        run: |
+          ls -R nagios-plugins-ets-1.4
 
       - name: Copy plugin files
         run: |
