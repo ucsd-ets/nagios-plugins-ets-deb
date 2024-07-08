@@ -11,7 +11,6 @@ permissions:
 jobs:
   rpm-release:
     name: Create DEB release
-    needs: [create-release]
     runs-on: ubuntu-latest
     # env:
     #   RPM_VERSION: ${{ github.ref_name | cut -c 2- | sed -i 's/-/~/g' }}
