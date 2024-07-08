@@ -15,7 +15,7 @@ jobs:
         run: |
           mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
           mkdir -p nagios-plugins-ets-1.4/DEBIAN
-          
+
       - name: Print folder structure
         run: |
           ls -R nagios-plugins-ets-1.4
@@ -34,8 +34,8 @@ jobs:
       - name: Copy plugin files
         run: |
           cp check_mem.c nagios-plugins-ets-1.4/
-          cp nagios-plugins-ets-1.4/DEBIAN/control nagios-plugins-ets-1.4/
-          cp nagios-plugins-ets-1.4/DEBIAN/postinst nagios-plugins-ets-1.4/
+          cp control nagios-plugins-ets-1.4/DEBIAN/
+          cp postinst nagios-plugins-ets-1.4/DEBIAN/
 
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
