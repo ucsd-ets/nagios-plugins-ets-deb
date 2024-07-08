@@ -2,20 +2,34 @@ name: Build and Release DEB Package
 
 on:
   push:
-    tags:
-      - 'v*'  # Trigger on new tags starting with 'v'
-permissions: write-all
+
 jobs:
   rpm-release:
     name: Create DEB release
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Create directories for DEB packaging
+        run: |
+          mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
+          mkdir -p nagios-plugins-ets-1.4/DEBIAN
+
+      - name: Download plugin files
+        run: |
+          # Download each file using wget
+          wget -O nagios-plugins-ets-1.4/check_mem.c https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_mem.c
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_service https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_service
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartctl https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartctl
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon2.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon2.py
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon.py
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
+          chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
+
+      - name: Copy plugin files
+        run: |
+          cp nagios-plugins-ets-1.4/DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/postinst nagios-plugins-ets-1.4/
 
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
@@ -24,19 +38,19 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure this token has the right permissions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}  # Tag that triggered the workflow
-          release_name: Release ${{ github.ref }}  # Name of the release
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
 
       - name: Upload DEB package to Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure this token has the right permissions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}  # Upload URL from the create release step
-          asset_path: ./nagios-plugins-ets-1.4.deb  # Path to the DEB package
-          asset_name: nagios-plugins-ets-1.4.deb  # Name of the asset
-          asset_content_type: application/vnd.debian.binary-package  # Content type
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nagios-plugins-ets-1.4.deb
+          asset_name: nagios-plugins-ets-1.4.deb
+          asset_content_type: application/vnd.debian.binary-package
