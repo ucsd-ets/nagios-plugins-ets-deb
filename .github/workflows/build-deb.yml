@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Debug: List files in repository
+      - name: List files in repository
         run: ls -R
 
       - name: Install dependencies
