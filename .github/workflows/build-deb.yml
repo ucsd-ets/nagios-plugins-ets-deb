@@ -21,13 +21,17 @@ jobs:
           mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
           mkdir -p nagios-plugins-ets-1.4/DEBIAN
 
-      - name: Copy files
+      - name: Copy control files
         run: |
-          cp nagios-plugins-ets-1.4/DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/
-          cp nagios-plugins-ets-1.4/DEBIAN/postinst nagios-plugins-ets-1.4/DEBIAN/
+          cp DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/
+          cp DEBIAN/postinst nagios-plugins-ets-1.4/DEBIAN/
           chmod 755 nagios-plugins-ets-1.4/DEBIAN/postinst
+
+      - name: Copy plugin files
+        run: |
           cp check_mem.c nagios-plugins-ets-1.4/check_mem.c
           cp -r usr/lib64/nagios/plugins/* nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/
+          chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
 
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
