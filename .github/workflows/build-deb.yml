@@ -17,14 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
       - name: Create directories for DEB packaging
-        run: |
-          mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
-
-      - name: Copy control files
-        run: |
-          cp nagios-plugins-ets-1.4/DEBIAN/control nagios-plugins-ets-1.4/DEBIAN/
-          cp nagios-plugins-ets-1.4/DEBIAN/postinst nagios-plugins-ets-1.4/DEBIAN/
-          chmod 755 nagios-plugins-ets-1.4/DEBIAN/postinst
+        run: mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
 
       - name: Copy plugin files
         run: |
