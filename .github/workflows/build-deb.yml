@@ -37,8 +37,8 @@ jobs:
 
       - name: Copy plugin files
         run: |
-          cp ../control nagios-plugins-ets-1.4/DEBIAN/
-          cp ../postinst nagios-plugins-ets-1.4/DEBIAN/
+          cp control nagios-plugins-ets-1.4/DEBIAN/
+          cp postinst nagios-plugins-ets-1.4/DEBIAN/
 
       - name: Build DEB package
         run: dpkg-deb --build nagios-plugins-ets-1.4
