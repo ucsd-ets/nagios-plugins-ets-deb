@@ -4,7 +4,8 @@ on:
   push:
     tags:
       - 'v*'  # Trigger on new tags starting with 'v'
-
+permissions:
+    contents: write
 jobs:
   rpm-release:
     name: Create DEB release
