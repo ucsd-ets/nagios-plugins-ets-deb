@@ -1,9 +1,12 @@
-Package: nagios-plugins-ets
-Version: 1.4
+Source: nagios-plugins-ets
 Section: utils
 Priority: optional
-Architecture: all
-Depends: python3-psutil, smartmontools
 Maintainer: Your Name <your.email@example.com>
+Rules-Requires-Root: no
+
+Package: nagios-plugins-ets
+Version: 1.4
+Architecture: amd64
+#Depends: python3-psutil, smartmontools
 Description: Nagios plugins for system monitoring
  Collection of Nagios plugins for system monitoring, including memory check, smartmon, zpools, and service checks.

@@ -51,3 +51,8 @@ ls -l /tmp/rpms/x86_64
 ```
 
 https://github.com/docker-rpm-builder/docker-rpm-builder
+
+
+# Building
+
+https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
