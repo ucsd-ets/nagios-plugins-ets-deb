@@ -1,50 +1,77 @@
-name: release
+name: Build and Release DEB Package
+
 on:
   push:
-
-permissions:
-  contents: write
-  packages: write
+    tags:
+      - '*'
 
 jobs:
-  deb-release:
+  rpm-release:
     name: Create DEB release
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout actions
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Set DEB_VERSION
-        run: |
-          echo "DEB_VERSION=$(echo ${{ github.ref_name }} | cut -c 2- | sed 's/-/~/g')" >> $GITHUB_ENV
-          
-      - name: Print DEB_VERSION
-        run: |
-          echo DEB_VERSION=$DEB_VERSION
-          
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential devscripts debhelper dh-make
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
-      - name: Prepare DEB build directory
+      - name: Check Directory
         run: |
-          mkdir -p ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          cp -r * ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          cd ~/debbuild/nagios-plugins-ets-${{ env.DEB_VERSION }}
-          dpkg-deb --build . ../nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
+          pwd
+          ls
 
-      - name: Print DEB Package
+      - name: Create directories for DEB packaging
         run: |
-          ls -al ~/debbuild/
-          
-      - name: Release DEB
+          mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
+          mkdir -p nagios-plugins-ets-1.4/DEBIAN
+
+      - name: Print folder structure
+        run: |
+          ls -R nagios-plugins-ets-1.4
+
+      - name: Download plugin files
+        run: |
+          # Download each file using wget
+          wget -O nagios-plugins-ets-1.4/check_mem.c https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_mem.c
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_service https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_service
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartctl https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartctl
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon2.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon2.py
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon.py
+          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
+          chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
+
+      - name: Print folder structure
+        run: |
+          ls -R nagios-plugins-ets-1.4
+
+      - name: Copy plugin files
+        run: |
+          cp control nagios-plugins-ets-1.4/DEBIAN/
+          cp postinst nagios-plugins-ets-1.4/DEBIAN/
+
+      - name: Build DEB package
+        run: dpkg-deb --build nagios-plugins-ets-1.4
+
+      - name: Extract tag name
+        id: extract_tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
+      - name: Create Release
+        id: create_release
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ~/debbuild/nagios-plugins-ets_${{ env.DEB_VERSION }}.deb
-          generate_release_notes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.extract_tag.outputs.tag }}
+          name: Release ${{ steps.extract_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload DEB package to Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ./nagios-plugins-ets-1.4.deb
+          content_type: application/vnd.debian.binary-package
