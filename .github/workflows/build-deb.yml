@@ -26,9 +26,9 @@ jobs:
       #     mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
       #     mkdir -p nagios-plugins-ets-1.4/DEBIAN
 
-      - name: Print folder structure
-        run: |
-          ls -R nagios-plugins-ets-1.4
+      # - name: Print folder structure
+      #   run: |
+      #     ls -R nagios-plugins-ets-1.4
 
       # - name: Download plugin files
       #   run: |
@@ -41,19 +41,21 @@ jobs:
           # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
           # chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
 
-      - name: Print folder structure
-        run: |
-          ls -R nagios-plugins-ets-1.4
+      # - name: Print folder structure
+      #   run: |
+      #     ls -R nagios-plugins-ets-1.4
 
-      - name: Copy plugin files
-        run: |
-          # cp control nagios-plugins-ets-1.4/DEBIAN/
-          # cp postinst nagios-plugins-ets-1.4/DEBIAN/
+      # - name: Copy plugin files
+      #   run: |
+      #     # cp control nagios-plugins-ets-1.4/DEBIAN/
+      #     # cp postinst nagios-plugins-ets-1.4/DEBIAN/
 
       # - name: Build DEB package
       #   run: dpkg-deb --build nagios-plugins-ets-1.4
       - name: Build DEB package
         run: |
+          wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+          tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
           debuild -us -uc
 
       - name: Extract tag name
@@ -76,5 +78,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ./nagios-plugins-ets-1.4.deb
+          files: ../nagios-plugins-ets-1.4.deb
           content_type: application/vnd.debian.binary-package
