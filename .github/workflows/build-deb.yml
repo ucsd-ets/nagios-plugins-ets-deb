@@ -2,8 +2,6 @@ name: Build and Release DEB Package
 
 on:
   push:
-    tags:
-      - '*'
 
 jobs:
   rpm-release:
