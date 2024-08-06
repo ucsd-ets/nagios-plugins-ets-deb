@@ -12,7 +12,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            dpkg-dev \
+            devscripts \
+            build-essential \
+            lintian
 
       - name: Check Directory
         run: |
