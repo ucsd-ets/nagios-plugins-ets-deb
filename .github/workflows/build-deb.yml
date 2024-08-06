@@ -18,7 +18,8 @@ jobs:
             dpkg-dev \
             devscripts \
             build-essential \
-            lintian
+            lintian \
+            debhelper
 
       - name: Check Directory
         run: |
