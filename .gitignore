@@ -1,9 +1,9 @@
-debian/nagios-plugins-ets
-debian/src
+/debian/nagios-plugins-ets
+/debian/src
 # src
 /nagios-plugins-ets_*
-/src/debian/.debhelper
-/src/debian/nagios-plugins-ets
+/debian/.debhelper
+/debian/nagios-plugins-ets
 /src/*.c
 /src/.gitignore
 /src/check_service
