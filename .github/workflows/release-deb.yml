@@ -58,9 +58,25 @@ jobs:
           tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
           debuild -us -uc
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+      - name: Extract tag name
+        id: extract_tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: nagios-plugins-ets_amd64.deb
-          path: |
-            nagios-plugins-ets_1.4_amd64.deb
+          tag_name: ${{ steps.extract_tag.outputs.tag }}
+          name: Release ${{ steps.extract_tag.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload DEB package to Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: ../nagios-plugins-ets-1.4.deb
+          content_type: application/vnd.debian.binary-package
