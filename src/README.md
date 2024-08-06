@@ -59,15 +59,7 @@ https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
 https://metebalci.com/blog/a-minimum-complete-example-of-debian-packaging-and-launchpad-ppa-hellodeb/
 
 
-1. Download the tar ball
-    wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-
-
-
-<!-- wget -O nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-
-wget https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz -->
-
+wget -O nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
 
 debuild -us -uc
 dpkg -c ../nagios-plugins-ets_1.4_amd64.deb

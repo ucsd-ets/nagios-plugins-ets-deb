@@ -3,9 +3,10 @@ Section: utils
 Priority: optional
 Maintainer: Your Name <your.email@example.com>
 Rules-Requires-Root: no
+Standards-Version: 1.2
 
 Package: nagios-plugins-ets
-Version: 1.4
+# Version: 1.4
 Architecture: amd64
 #Depends: python3-psutil, smartmontools
 Description: Nagios plugins for system monitoring

@@ -1,2 +1,4 @@
 debian/nagios-plugins-ets
 debian/src
+# src
+/nagios-plugins-ets_*
