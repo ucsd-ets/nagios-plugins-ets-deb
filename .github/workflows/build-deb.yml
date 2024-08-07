@@ -11,7 +11,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
+      - name: Install debuild
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -21,48 +21,13 @@ jobs:
             lintian \
             debhelper
 
-      - name: Check Directory
-        run: |
-          pwd
-          ls
-
-      # - name: Create directories for DEB packaging
-      #   run: |
-      #     mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
-      #     mkdir -p nagios-plugins-ets-1.4/DEBIAN
-
-      # - name: Print folder structure
-      #   run: |
-      #     ls -R nagios-plugins-ets-1.4
-
-      # - name: Download plugin files
-      #   run: |
-          # Download each file using wget
-          # wget -O nagios-plugins-ets-1.4/check_mem.c https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_mem.c
-          # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_service https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_service
-          # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartctl https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartctl
-          # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon2.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon2.py
-          # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon.py
-          # wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
-          # chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
-
-      # - name: Print folder structure
-      #   run: |
-      #     ls -R nagios-plugins-ets-1.4
-
-      # - name: Copy plugin files
-      #   run: |
-      #     # cp control nagios-plugins-ets-1.4/DEBIAN/
-      #     # cp postinst nagios-plugins-ets-1.4/DEBIAN/
-
-      # - name: Build DEB package
-      #   run: dpkg-deb --build nagios-plugins-ets-1.4
-      - name: Build DEB package
+      - name: Download the source tarball
         run: |
           wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
           tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
-          rm README.md
-          rm -rf .github
+
+      - name: Build DEB package
+        run: |
           debuild -us -uc
 
       - name: Archive production artifacts
@@ -70,4 +35,4 @@ jobs:
         with:
           name: nagios-plugins-ets_amd64.deb
           path: |
-            nagios-plugins-ets_1.4_amd64.deb
+            ../nagios-plugins-ets_1.4_amd64.deb
