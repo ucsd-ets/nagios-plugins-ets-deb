@@ -55,13 +55,27 @@ https://github.com/docker-rpm-builder/docker-rpm-builder
 
 # Building
 
-1. Download the tar ball
+1. Install debuild
+       sudo apt-get install -y \
+              dpkg-dev \
+              devscripts \
+              build-essential \
+              lintian \
+              debhelper
+
+2. Clone the debian package repo
+    git clone https://github.com/ucsd-ets/nagios-plugins-ets-deb.git
+
+3. Download the source tarball
     wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-2. Extract source
+
+4. Extract source
     tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
-3. Run debuild
+
+5. Run debuild
     debuild -us -uc
-4. Check the output
+
+6. Check the output
     dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
 
 See:
