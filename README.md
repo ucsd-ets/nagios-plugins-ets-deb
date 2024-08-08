@@ -53,9 +53,10 @@ ls -l /tmp/rpms/x86_64
 https://github.com/docker-rpm-builder/docker-rpm-builder
 
 
-# Building
+# How to build the deb
 
 1. Install debuild
+
        sudo apt-get install -y \
               dpkg-dev \
               devscripts \
@@ -64,19 +65,23 @@ https://github.com/docker-rpm-builder/docker-rpm-builder
               debhelper
 
 2. Clone the debian package repo
-    git clone https://github.com/ucsd-ets/nagios-plugins-ets-deb.git
+
+        git clone https://github.com/ucsd-ets/nagios-plugins-ets-deb.git
 
 3. Download the source tarball
-    wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+
+        wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
 
 4. Extract source
-    tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
+
+        tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
 
 5. Run debuild
-    debuild -us -uc
+
+        debuild -us -uc
 
 6. Check the output
-    dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
+        dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
 
 See:
 * https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
@@ -85,12 +90,11 @@ See:
 
 # Installation
 
-dpkg -i nagios-plugins-ets-1.4.deb
+    dpkg -i nagios-plugins-ets-1.4.deb
 
 
 
-notes:
-
+# notes
 
 debuild calls dh build which calls dh_auto_build which calls make -j1 which selects the 1st goal which is install.
 
