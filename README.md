@@ -55,6 +55,9 @@ https://github.com/docker-rpm-builder/docker-rpm-builder
 
 # How to build the deb
 
+Refer to the [tutorial](https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html) for the directory structure.
+
+
 1. Install debuild
 
        sudo apt-get install -y \
