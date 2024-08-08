@@ -55,24 +55,32 @@ https://github.com/docker-rpm-builder/docker-rpm-builder
 
 # Building
 
-https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
-https://metebalci.com/blog/a-minimum-complete-example-of-debian-packaging-and-launchpad-ppa-hellodeb/
-
-
 1. Download the tar ball
     wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+2. Extract source
+    tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
+3. Run debuild
+    debuild -us -uc
+4. Check the output
+    dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
 
-
-
-<!-- wget -O nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-
-wget https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz -->
-
-
-debuild -us -uc
-dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
-
+See:
+* https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
+* https://metebalci.com/blog/a-minimum-complete-example-of-debian-packaging-and-launchpad-ppa-hellodeb/
+* https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
 
 # Installation
 
 dpkg -i nagios-plugins-ets-1.4.deb
+
+
+
+notes:
+
+
+debuild calls dh build which calls dh_auto_build which calls make -j1 which selects the 1st goal which is install.
+
+When I've added
+
+all:
+before install to makefile, the problem was solved.
