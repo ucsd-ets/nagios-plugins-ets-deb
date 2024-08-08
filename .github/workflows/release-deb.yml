@@ -54,8 +54,10 @@ jobs:
       #   run: dpkg-deb --build nagios-plugins-ets-1.4
       - name: Build DEB package
         run: |
-          wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-          tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
+          ## READ VERSION FROM CONTROL FILE
+          VERSION=1.2
+          wget -O ../nagios-plugins-ets_${VERSION}.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+          tar zxvf ../nagios-plugins-ets_${VERSION}.orig.tar.gz --strip-components=1
           debuild -us -uc
 
       - name: Extract tag name
