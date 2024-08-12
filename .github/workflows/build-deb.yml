@@ -16,6 +16,7 @@ jobs:
         run: |
           VERSION=$(grep -Eo "^Version: .+" debian/control | awk '{print $2}')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "The extracted version is: $VERSION"
 
       - name: Install debuild
         run: |
