@@ -1,0 +1,13 @@
+Package: nagios-plugins-ets-dbgsym
+Package-Type: ddeb
+Source: nagios-plugins-ets
+Version: 1.4
+Auto-Built-Package: debug-symbols
+Architecture: amd64
+Maintainer: Your Name <your.email@example.com>
+Installed-Size: 15
+Depends: nagios-plugins-ets (= 1.4)
+Section: debug
+Priority: optional
+Description: debug symbols for nagios-plugins-ets
+Build-Ids: 569812d63821c8fa3b6c945b9cc1334f5021ca13

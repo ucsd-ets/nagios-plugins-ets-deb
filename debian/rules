@@ -24,6 +24,12 @@ override_dh_auto_install:
 # 	ls -al
 # 	ls -al output
 	install -p -m0755 output/check_mem debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_mem
+	install -p -m0755 check_service debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_service
+	install -p -m0755 check_smartctl debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartctl
+	install -p -m0755 check_smartmon.py debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartmon.py
+	install -p -m0755 check_smartmon2.py debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartmon2.py
+	install -p -m0755 check_zpools.sh debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_zpools.sh
+	
 
 
 override_dh_auto_configure:

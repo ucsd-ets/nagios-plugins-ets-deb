@@ -1,0 +1,7 @@
+10c6362f6044c1436c4037dde8e7d161  usr/lib64/nagios/plugins/check_mem
+8e2475317d2e7a9c6645dba25f338011  usr/lib64/nagios/plugins/check_service
+989c1cb7943a34f717fc1387ae571714  usr/lib64/nagios/plugins/check_smartctl
+7e987e1d6991dff2855768fdd89d09e1  usr/lib64/nagios/plugins/check_smartmon.py
+771fe34b732d0e70e971f6974c26c503  usr/lib64/nagios/plugins/check_smartmon2.py
+97f7a85b0408f048d1a135eae3f86840  usr/lib64/nagios/plugins/check_zpools.sh
+91ea16fd2f132670283a5e8eeaf3d30a  usr/share/doc/nagios-plugins-ets/changelog.gz

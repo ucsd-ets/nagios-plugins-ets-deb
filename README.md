@@ -73,7 +73,7 @@ Refer to the [tutorial](https://www.debian.org/doc/manuals/debmake-doc/ch04.en.h
 
 3. Download the source tarball
 
-        wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ /
+        wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ \
             ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
 
 4. Extract source

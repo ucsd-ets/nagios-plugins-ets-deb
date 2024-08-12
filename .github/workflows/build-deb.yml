@@ -4,12 +4,18 @@ on:
   push:
 
 jobs:
-  rpm-release:
+  deb-release:
     name: Create DEB release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
+
+      - name: Get Version from control file
+        id: get_version
+        run: |
+          VERSION=$(grep -Eo "^Version: .+" debian/control | awk '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Install debuild
         run: |
@@ -23,13 +29,13 @@ jobs:
 
       - name: Download the source tarball
         run: |
-          wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
-          tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
+          wget -O ../nagios-plugins-ets_${VERSION}.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/${VERSION}.tar.gz
+          tar zxvf ../nagios-plugins-ets_${VERSION}.orig.tar.gz --strip-components=1
 
       - name: Build DEB package
         run: |
           debuild -us -uc
-          cp ../nagios-plugins-ets_1.4_amd64.deb nagios-plugins-ets_amd64.deb
+          cp ../nagios-plugins-ets_${VERSION}_amd64.deb nagios-plugins-ets_amd64.deb
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4

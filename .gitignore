@@ -1,15 +1,1 @@
-/debian/nagios-plugins-ets
-/nagios-plugins-ets_*
-/debian/.debhelper
-/debian/nagios-plugins-ets
-/*.c
-/.gitignore
-/check_service
-/check_smartctl
-/check_smartctl.1
-/*.py*
-/*.sh
-/Makefile
-/output
-/debian/files
-/debian/nagios-plugins-ets.*
+output
