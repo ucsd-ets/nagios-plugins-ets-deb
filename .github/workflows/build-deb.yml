@@ -37,11 +37,11 @@ jobs:
         run: |
           debuild -us -uc
           ls -l ../
-          cp ../nagios-plugins-ets_${VERSION}_amd64.deb nagios-plugins-ets_${VERSION}_amd64.deb
+          cp ../nagios-plugins-ets_${env.VERSION}_amd64.deb nagios-plugins-ets_${env.VERSION}_amd64.deb
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nagios-plugins-ets_${VERSION}_amd64.deb
+          name: nagios-plugins-ets_${env.VERSION}_amd64.deb
           path: |
-            nagios-plugins-ets_${VERSION}_amd64.deb
+            nagios-plugins-ets_${env.VERSION}_amd64.deb
