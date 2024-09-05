@@ -2,76 +2,49 @@ name: Build and Release DEB Package
 
 on:
   push:
-    tags:
-      - '*'
 
 jobs:
-  rpm-release:
+  deb-release:
     name: Create DEB release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-        
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
-      - name: Check Directory
+      - name: Get Version from control file
+        id: get_version
         run: |
-          pwd
-          ls
+          VERSION=$(grep -Eo "^Version: .+" debian/control | awk '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "The extracted version is: $VERSION"
 
-      - name: Create directories for DEB packaging
+      - name: Install debuild
         run: |
-          mkdir -p nagios-plugins-ets-1.4/usr/lib64/nagios/plugins
-          mkdir -p nagios-plugins-ets-1.4/DEBIAN
+          sudo apt-get update
+          sudo apt-get install -y \
+            dpkg-dev \
+            devscripts \
+            build-essential \
+            lintian \
+            debhelper
 
-      - name: Print folder structure
+      - name: Download the source tarball
         run: |
-          ls -R nagios-plugins-ets-1.4
-
-      - name: Download plugin files
-        run: |
-          # Download each file using wget
-          wget -O nagios-plugins-ets-1.4/check_mem.c https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_mem.c
-          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_service https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_service
-          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartctl https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartctl
-          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon2.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon2.py
-          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_smartmon.py https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_smartmon.py
-          wget -O nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/check_zpools.sh https://github.com/ucsd-ets/nagios-plugins-ets/blob/master/check_zpools.sh
-          chmod 755 nagios-plugins-ets-1.4/usr/lib64/nagios/plugins/*
-
-      - name: Print folder structure
-        run: |
-          ls -R nagios-plugins-ets-1.4
-
-      - name: Copy plugin files
-        run: |
-          cp control nagios-plugins-ets-1.4/DEBIAN/
-          cp postinst nagios-plugins-ets-1.4/DEBIAN/
+          wget -O ../nagios-plugins-ets_${VERSION}.orig.tar.gz https://github.com/ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+          tar zxvf ../nagios-plugins-ets_${VERSION}.orig.tar.gz --strip-components=1
 
       - name: Build DEB package
-        run: dpkg-deb --build nagios-plugins-ets-1.4
+        run: |
+          debuild -us -uc
+          cp ../nagios-plugins-ets_${VERSION}_amd64.deb nagios-plugins-ets_${VERSION}_amd64.deb
+          
+      - name: Print path
+        run: | 
+          ls -l ../
 
-      - name: Extract tag name
-        id: extract_tag
-        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ steps.extract_tag.outputs.tag }}
-          name: Release ${{ steps.extract_tag.outputs.tag }}
-          draft: false
-          prerelease: false
-
-      - name: Upload DEB package to Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: ./nagios-plugins-ets-1.4.deb
-          content_type: application/vnd.debian.binary-package
+          name: nagios-plugins-ets_${{env.VERSION}}_amd64.deb
+          path: |
+            nagios-plugins-ets_${{env.VERSION}}_amd64.deb

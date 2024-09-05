@@ -1,0 +1,44 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+%:
+	dh $@
+# rm -rf src
+# git clone https://github.com/ucsd-ets/nagios-plugins-ets.git src
+# # cp src/* .
+# cd src
+# ls -al
+
+override_dh_auto_install:
+	pwd
+	ls -al
+	make
+	ls -al
+# 	echo hello
+# 	pwd
+# 	# install -d debian/src/usr/lib64/nagios/plugins
+# 	#install -d debian/nagios-plugins-ets/usr/lib64/nagios/nagios-plugins-ets
+# 	# mkdir -p debian/src
+# 	# echo x > debian/src/check_memory
+	mkdir -p debian/nagios-plugins-ets/usr/lib64/nagios/plugins
+# 	# echo x > debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_memory
+# 	ls -al
+# 	ls -al output
+	install -p -m0755 output/check_mem debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_mem
+	install -p -m0755 check_service debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_service
+	install -p -m0755 check_smartctl debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartctl
+	install -p -m0755 check_smartmon.py debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartmon.py
+	install -p -m0755 check_smartmon2.py debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_smartmon2.py
+	install -p -m0755 check_zpools.sh debian/nagios-plugins-ets/usr/lib64/nagios/plugins/check_zpools.sh
+	
+
+
+override_dh_auto_configure:
+	echo hello
+# 	pwd
+# 	ls -al debian
+#!/usr/bin/make -f
+# You must remove unused comment lines for the released package.
+#export DH_VERBOSE = 1
+
+# %:
+# /debian/nagios-plugins-ets/usr

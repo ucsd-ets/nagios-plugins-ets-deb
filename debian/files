@@ -1,0 +1,3 @@
+nagios-plugins-ets-dbgsym_1.4_amd64.ddeb debug optional automatic=yes
+nagios-plugins-ets_1.4_amd64.buildinfo utils optional
+nagios-plugins-ets_1.4_amd64.deb utils optional

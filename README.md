@@ -51,3 +51,58 @@ ls -l /tmp/rpms/x86_64
 ```
 
 https://github.com/docker-rpm-builder/docker-rpm-builder
+
+
+# How to build the deb
+
+Refer to the [tutorial](https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html) for the directory structure.
+
+
+1. Install debuild
+
+       sudo apt-get install -y \
+              dpkg-dev \
+              devscripts \
+              build-essential \
+              lintian \
+              debhelper
+
+2. Clone the debian package repo
+
+        git clone https://github.com/ucsd-ets/nagios-plugins-ets-deb.git
+
+3. Download the source tarball
+
+        wget -O ../nagios-plugins-ets_1.4.orig.tar.gz https://github.com/ \
+            ucsd-ets/nagios-plugins-ets/archive/refs/tags/1.2.tar.gz
+
+4. Extract source
+
+        tar zxvf ../nagios-plugins-ets_1.4.orig.tar.gz --strip-components=1
+
+5. Run debuild
+
+        debuild -us -uc
+
+6. Check the output
+        dpkg -c ../nagios-plugins-ets_1.4_amd64.deb
+
+See:
+* https://blog.packagecloud.io/buildling-debian-packages-with-debuild/
+* https://metebalci.com/blog/a-minimum-complete-example-of-debian-packaging-and-launchpad-ppa-hellodeb/
+* https://www.debian.org/doc/manuals/debmake-doc/ch04.en.html
+
+# Installation
+
+    dpkg -i nagios-plugins-ets-1.4.deb
+
+
+
+# notes
+
+debuild calls dh build which calls dh_auto_build which calls make -j1 which selects the 1st goal which is install.
+
+When I've added
+
+all:
+before install to makefile, the problem was solved.
